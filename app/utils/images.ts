@@ -1,7 +1,7 @@
-import type { MultipartFile } from "@adonisjs/core/types/bodyparser";
-
 import sharp from "sharp";
 import type { ResizeOptions, TimeoutOptions } from "sharp";
+
+import type { MultipartFile } from "@adonisjs/core/types/bodyparser";
 
 import env from "#start/env";
 

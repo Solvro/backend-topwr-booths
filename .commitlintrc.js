@@ -1,3 +1,3 @@
-module.exports = {
-  extends: ["@commitlint/config-conventional"],
+export default {
+  extends: ["@solvro/config/commitlint"],
 };

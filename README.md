@@ -5,6 +5,7 @@ Booth occupancy monitoring API built with AdonisJS 6, PostgreSQL, and Lucid ORM.
 ## Overview
 
 The service stores:
+
 - booth metadata in `booths`
 - occupancy history in `booth_statuses` (append-only)
 - uploaded files in `file_entries`
@@ -45,6 +46,7 @@ open http://localhost:3333/api/v1/docs
 ## Environment
 
 Required values are in `.env.example`:
+
 - `APP_URL` - base URL for generated file links
 - `MINIATURE_MAX_HEIGHT_PX` - thumbnail max height
 - `MINIATURE_MAX_PROCESSING_TIME_S` - Sharp processing timeout
@@ -52,17 +54,18 @@ Required values are in `.env.example`:
 
 ## API Endpoints
 
-| Method | Path                    | Auth  | Description |
-| ------ | ----------------------- | ----- | ----------- |
-| POST   | `/api/v1/files`         | Token | Upload file, returns `key` (`uuid.ext`) |
-| GET    | `/api/v1/files/:key`    | -     | Get file metadata (`url`, `miniaturesUrl`) |
-| POST   | `/api/v1/booths`        | Token | Create booth metadata |
-| POST   | `/api/v1/status`        | Token | Append booth status and optionally update metadata |
-| GET    | `/api/v1/status`        | -     | Get latest status for all booths |
-| GET    | `/api/v1/status/:boothId` | -   | Get latest status for one booth |
-| GET    | `/api/v1/healthcheck`   | -     | Health endpoint |
+| Method | Path                      | Auth  | Description                                        |
+| ------ | ------------------------- | ----- | -------------------------------------------------- |
+| POST   | `/api/v1/files`           | Token | Upload file, returns `key` (`uuid.ext`)            |
+| GET    | `/api/v1/files/:key`      | -     | Get file metadata (`url`, `miniaturesUrl`)         |
+| POST   | `/api/v1/booths`          | Token | Create booth metadata                              |
+| POST   | `/api/v1/status`          | Token | Append booth status and optionally update metadata |
+| GET    | `/api/v1/status`          | -     | Get latest status for all booths                   |
+| GET    | `/api/v1/status/:boothId` | -     | Get latest status for one booth                    |
+| GET    | `/api/v1/healthcheck`     | -     | Health endpoint                                    |
 
 Uploaded files are also served publicly by Drive:
+
 - original: `/uploads/:key`
 - miniature: `/uploads/miniatures/:key`
 

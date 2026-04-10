@@ -1,8 +1,7 @@
-import assert from "node:assert";
+import vine from "@vinejs/vine";
 
 import type { HttpContext, Request } from "@adonisjs/core/http";
 import drive from "@adonisjs/drive/services/main";
-import vine from "@vinejs/vine";
 
 import FileEntry from "#models/file_entry";
 import FilesService from "#services/files_service";
@@ -33,12 +32,7 @@ export default class FilesController {
       entry = await this.formUpload(request);
     }
 
-    let metadata;
-    try {
-      metadata = await drive.use().getMetaData(entry.keyWithExtension);
-    } catch (error) {
-      throw error;
-    }
+    const metadata = await drive.use().getMetaData(entry.keyWithExtension);
 
     if (metadata.contentLength <= 0) {
       return response.badRequest({ message: "Attempted to upload empty file" });
@@ -62,7 +56,6 @@ export default class FilesController {
       throw new Error("No file provided");
     }
 
-    assert(file.extname !== null);
     return await FilesService.uploadMultipartFile(file);
   }
 

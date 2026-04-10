@@ -50,13 +50,14 @@ export default class BoothStatusController {
       });
 
       await booth.load("photo");
+      const photo = this.serializePhoto(booth);
 
       return response.status(201).json({
         booth_id: booth.externalId,
         booth_name: booth.name,
-        photo_key: booth.photo?.keyWithExtension ?? null,
-        photo_url: booth.photo?.url ?? null,
-        photo_miniature_url: booth.photo?.miniaturesUrl ?? null,
+        photo_key: photo.key,
+        photo_url: photo.url,
+        photo_miniature_url: photo.miniatureUrl,
         localization: booth.localization,
       });
     } catch (error) {
@@ -87,7 +88,9 @@ export default class BoothStatusController {
           ? await this.resolvePhotoKey(data.photo_key)
           : null;
 
-      let booth = await Booth.query().where("externalId", data.booth_id).first();
+      let booth = await Booth.query()
+        .where("externalId", data.booth_id)
+        .first();
       if (booth === null) {
         booth = await Booth.create({
           externalId: data.booth_id,
@@ -112,6 +115,7 @@ export default class BoothStatusController {
       }
 
       await booth.load("photo");
+      const photo = this.serializePhoto(booth);
 
       const boothStatus = await BoothStatus.create({
         boothId: booth.id,
@@ -119,14 +123,15 @@ export default class BoothStatusController {
         reportedAt: now,
       });
 
-      const isOnline = boothStatus.reportedAt >= DateTime.now().minus({ minutes: 3 });
+      const isOnline =
+        boothStatus.reportedAt >= DateTime.now().minus({ minutes: 3 });
 
       return response.status(200).json({
         booth_id: booth.externalId,
         booth_name: booth.name,
-        photo_key: booth.photo?.keyWithExtension ?? null,
-        photo_url: booth.photo?.url ?? null,
-        photo_miniature_url: booth.photo?.miniaturesUrl ?? null,
+        photo_key: photo.key,
+        photo_url: photo.url,
+        photo_miniature_url: photo.miniatureUrl,
         localization: booth.localization,
         is_occupied: boothStatus.isOccupied,
         reported_at: boothStatus.reportedAt.toISO(),
@@ -155,6 +160,7 @@ export default class BoothStatusController {
 
       const boothsData = await Promise.all(
         booths.map(async (booth) => {
+          const photo = this.serializePhoto(booth);
           const latestStatus = await BoothStatus.query()
             .where("boothId", booth.id)
             .orderBy("reportedAt", "desc")
@@ -164,9 +170,9 @@ export default class BoothStatusController {
             return {
               booth_id: booth.externalId,
               booth_name: booth.name,
-              photo_key: booth.photo?.keyWithExtension ?? null,
-              photo_url: booth.photo?.url ?? null,
-              photo_miniature_url: booth.photo?.miniaturesUrl ?? null,
+              photo_key: photo.key,
+              photo_url: photo.url,
+              photo_miniature_url: photo.miniatureUrl,
               localization: booth.localization,
               is_occupied: null,
               reported_at: null,
@@ -180,9 +186,9 @@ export default class BoothStatusController {
           return {
             booth_id: booth.externalId,
             booth_name: booth.name,
-            photo_key: booth.photo?.keyWithExtension ?? null,
-            photo_url: booth.photo?.url ?? null,
-            photo_miniature_url: booth.photo?.miniaturesUrl ?? null,
+            photo_key: photo.key,
+            photo_url: photo.url,
+            photo_miniature_url: photo.miniatureUrl,
             localization: booth.localization,
             is_occupied: latestStatus.isOccupied,
             reported_at: latestStatus.reportedAt.toISO(),
@@ -223,6 +229,7 @@ export default class BoothStatusController {
       if (booth === null) {
         return response.status(404).json({ message: "Booth not found" });
       }
+      const photo = this.serializePhoto(booth);
 
       const latestStatus = await BoothStatus.query()
         .where("boothId", booth.id)
@@ -233,9 +240,9 @@ export default class BoothStatusController {
         return response.status(200).json({
           booth_id: booth.externalId,
           booth_name: booth.name,
-          photo_key: booth.photo?.keyWithExtension ?? null,
-          photo_url: booth.photo?.url ?? null,
-          photo_miniature_url: booth.photo?.miniaturesUrl ?? null,
+          photo_key: photo.key,
+          photo_url: photo.url,
+          photo_miniature_url: photo.miniatureUrl,
           localization: booth.localization,
           is_occupied: null,
           reported_at: null,
@@ -249,9 +256,9 @@ export default class BoothStatusController {
       return response.status(200).json({
         booth_id: booth.externalId,
         booth_name: booth.name,
-        photo_key: booth.photo?.keyWithExtension ?? null,
-        photo_url: booth.photo?.url ?? null,
-        photo_miniature_url: booth.photo?.miniaturesUrl ?? null,
+        photo_key: photo.key,
+        photo_url: photo.url,
+        photo_miniature_url: photo.miniatureUrl,
         localization: booth.localization,
         is_occupied: latestStatus.isOccupied,
         reported_at: latestStatus.reportedAt.toISO(),
@@ -267,9 +274,7 @@ export default class BoothStatusController {
     }
   }
 
-  private async resolvePhotoKey(
-    photoKey: string,
-  ): Promise<string | null> {
+  private async resolvePhotoKey(photoKey: string): Promise<string | null> {
     const trimmed = FilesService.trimKey(photoKey);
     const fileEntry = await FileEntry.find(trimmed);
 
@@ -278,5 +283,25 @@ export default class BoothStatusController {
     }
 
     return fileEntry.id;
+  }
+
+  private serializePhoto(booth: Booth): {
+    key: string | null;
+    url: string | null;
+    miniatureUrl: string | null;
+  } {
+    if (booth.photoKey === null) {
+      return {
+        key: null,
+        url: null,
+        miniatureUrl: null,
+      };
+    }
+
+    return {
+      key: booth.photo.keyWithExtension,
+      url: booth.photo.url ?? null,
+      miniatureUrl: booth.photo.miniaturesUrl ?? null,
+    };
   }
 }
