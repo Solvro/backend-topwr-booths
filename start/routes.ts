@@ -8,6 +8,9 @@ import { middleware } from "#start/kernel";
 const BoothStatusController = () =>
   import("#controllers/booth_status_controller");
 const FilesController = () => import("#controllers/files_controller");
+const MetricsMiddleware = () => import("@solvro/solvronis-metrics");
+
+router.get("/metrics", [MetricsMiddleware, "emitMetrics"]);
 
 router
   .group(() => {
