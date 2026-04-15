@@ -16,6 +16,7 @@ export default {
   snakeCase: true,
   debug: false,
   ignore: [
+    "/metrics",
     "/api/v1/swagger",
     "/api/v1/docs",
     "/",

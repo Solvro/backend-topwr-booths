@@ -1,0 +1,604 @@
+openapi: "3.0.0"
+info:
+  title: "Booth Monitor API"
+  version: "1.0.0"
+  description: "Simple API for monitoring booth occupancy status. Booths send their status every minute via authenticated POST requests. If a booth doesn't send updates for 3 minutes, it's considered offline."
+components:
+  responses:
+    Forbidden:
+      description: "Access token is missing or invalid"
+    Accepted:
+      description: "The request was accepted"
+    Created:
+      description: "The resource has been created"
+    NotFound:
+      description: "The resource has been created"
+    NotAcceptable:
+      description: "The resource has been created"
+  securitySchemes:
+    BearerAuth:
+      type: "http"
+      scheme: "bearer"
+    BasicAuth:
+      type: "http"
+      scheme: "basic"
+    ApiKeyAuth:
+      type: "apiKey"
+      in: "header"
+      name: "x-api-token"
+      description: "API token for booth authentication"
+  schemas:
+    Any:
+      description: "Any JSON object not defined as schema"
+    PaginationMeta:
+      type: "object"
+      properties:
+        total:
+          type: "number"
+          example: 100
+          nullable: false
+        page:
+          type: "number"
+          example: 2
+          nullable: false
+        perPage:
+          type: "number"
+          example: 10
+          nullable: false
+        currentPage:
+          type: "number"
+          example: 3
+          nullable: false
+        lastPage:
+          type: "number"
+          example: 10
+          nullable: false
+        firstPage:
+          type: "number"
+          example: 1
+          nullable: false
+        lastPageUrl:
+          type: "string"
+          example: "/?page=10"
+          nullable: false
+        firstPageUrl:
+          type: "string"
+          example: "/?page=1"
+          nullable: false
+        nextPageUrl:
+          type: "string"
+          example: "/?page=6"
+          nullable: false
+        previousPageUrl:
+          type: "string"
+          example: "/?page=5"
+          nullable: false
+    ApiToken:
+      type: "object"
+      required: []
+      properties:
+        id:
+          type: "number"
+          example: 771
+        name:
+          type: "string"
+          example: "John Doe"
+        hash:
+          type: "string"
+          example: "Lorem Ipsum"
+        created_at:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        updated_at:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        last_used_at:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+      description: "ApiToken (Model)"
+    Booth:
+      type: "object"
+      required: []
+      properties:
+        id:
+          type: "number"
+          example: 378
+        external_id:
+          type: "string"
+          example: "Lorem Ipsum"
+        name:
+          type: "string"
+          example: "John Doe"
+        photo_key:
+          type: "string"
+          example: "Lorem Ipsum"
+        localization:
+          type: "string"
+          example: "Lorem Ipsum"
+        created_at:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        updated_at:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        statuses:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/BoothStatus"
+            example: null
+        photo:
+          $ref: "#/components/schemas/FileEntry"
+          example: null
+      description: "Booth (Model)"
+    BoothStatus:
+      type: "object"
+      required: []
+      properties:
+        id:
+          type: "number"
+          example: 220
+        booth_id:
+          type: "number"
+          example: 793
+        is_occupied:
+          type: "boolean"
+          example: true
+        reported_at:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        created_at:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        updated_at:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        booth:
+          $ref: "#/components/schemas/Booth"
+          example: null
+      description: "BoothStatus (Model)"
+    FileEntry:
+      type: "object"
+      required: []
+      properties:
+        id:
+          type: "string"
+          example: "Lorem Ipsum"
+        file_extension:
+          type: "string"
+          example: "Lorem Ipsum"
+        created_at:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        updated_at:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        url:
+          type: "string"
+          example: "https://example.com"
+        miniatures_url:
+          type: "string"
+          example: "Lorem Ipsum"
+      description: "FileEntry (Model)"
+    createBoothValidator:
+      type: "object"
+      properties:
+        booth_id:
+          type: "string"
+          example: "Lorem Ipsum"
+          required: true
+          minLength: 1
+        booth_name:
+          type: "string"
+          example: "Lorem Ipsum"
+          required: true
+          minLength: 1
+        photo_key:
+          type: "string"
+          example: "Lorem Ipsum"
+        localization:
+          type: "string"
+          example: "Lorem Ipsum"
+      example:
+        booth_id: "Lorem Ipsum"
+        booth_name: "Lorem Ipsum"
+        photo_key: "Lorem Ipsum"
+        localization: "Lorem Ipsum"
+      description: "createBoothValidator (Validator)"
+    updateBoothStatusValidator:
+      type: "object"
+      properties:
+        booth_id:
+          type: "string"
+          example: "Lorem Ipsum"
+          required: true
+          minLength: 1
+        booth_name:
+          type: "string"
+          example: "Lorem Ipsum"
+          required: true
+          minLength: 1
+        photo_key:
+          type: "string"
+          example: "Lorem Ipsum"
+        localization:
+          type: "string"
+          example: "Lorem Ipsum"
+        is_occupied:
+          type: "boolean"
+          example: true
+          required: true
+      example:
+        booth_id: "Lorem Ipsum"
+        booth_name: "Lorem Ipsum"
+        photo_key: "Lorem Ipsum"
+        localization: "Lorem Ipsum"
+        is_occupied: true
+      description: "updateBoothStatusValidator (Validator)"
+paths:
+  /uploads/*:
+    get:
+      summary: "route"
+      description: "\n\n __ - ****"
+      parameters: []
+      tags: []
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json: {}
+      security: []
+  /uploads/miniatures/*:
+    get:
+      summary: "route"
+      description: "\n\n __ - ****"
+      parameters: []
+      tags:
+        - "*"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json: {}
+      security: []
+  /api/v1/booths:
+    post:
+      summary: "Create new booth (createBooth)"
+      description: "Returns **201** (Created) as **application/json**\n\n _app/controllers/booth_status_controller.ts_ - **createBooth**"
+      parameters: []
+      tags:
+        - "BOOTHS"
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  booth_id: "string"
+                  booth_name: "string"
+                  photo_key: "string|null"
+                  photo_url: "string|null"
+                  photo_miniature_url: "string|null"
+                  localization: "string|null"
+              example:
+                booth_id: "string"
+                booth_name: "string"
+                photo_key: "string|null"
+                photo_url: "string|null"
+                photo_miniature_url: "string|null"
+                localization: "string|null"
+          description: "Returns **201** (Created) as **application/json**"
+        401:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error: "string"
+              example:
+                error: "string"
+          description: "Returns **401** (Unauthorized) as **application/json**"
+        403:
+          description: "Returns **403** (Forbidden)"
+        409:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message: "string"
+              example:
+                message: "string"
+          description: "Returns **409** (Conflict) as **application/json**"
+        500:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message: "string"
+                  error: "string"
+              example:
+                message: "string"
+                error: "string"
+          description: "Returns **500** (Internal Server Error) as **application/json**"
+      security:
+        - ApiKeyAuth:
+            - "access"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                booth_id: "string"
+                booth_name: "string"
+                photo_key: "string?"
+                localization: "string?"
+            example:
+              booth_id: "string"
+              booth_name: "string"
+              photo_key: "string?"
+              localization: "string?"
+  /api/v1/files/{key}:
+    get:
+      summary: " (get)"
+      description: "\n\n _app/controllers/files_controller.ts_ - **get**"
+      parameters:
+        - in: "path"
+          name: "key"
+          schema:
+            type: "string"
+          required: true
+      tags:
+        - "FILES"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json: {}
+      security: []
+  /api/v1/files:
+    post:
+      summary: " (post)"
+      description: "\n\n _app/controllers/files_controller.ts_ - **post**"
+      parameters: []
+      tags:
+        - "FILES"
+      responses:
+        401:
+          description: "Returns **401** (Unauthorized)"
+        403:
+          description: "Returns **403** (Forbidden)"
+      security:
+        - ApiKeyAuth:
+            - "access"
+      requestBody:
+        content:
+          application/json: {}
+  /api/v1/status:
+    get:
+      summary: "Get latest statuses for all booths (index)"
+      description: "Returns **200** (OK) as **application/json**\n\n _app/controllers/booth_status_controller.ts_ - **index**"
+      parameters: []
+      tags:
+        - "STATUS"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+              example:
+                - booth_id: "string"
+                  booth_name: "string"
+                  photo_key: "string|null"
+                  photo_url: "string|null"
+                  photo_miniature_url: "string|null"
+                  localization: "string|null"
+                  is_occupied: "boolean"
+                  reported_at: "timestamp"
+                  is_online: "boolean"
+          description: "Returns **200** (OK) as **application/json**"
+        500:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message: "string"
+                  error: "string"
+              example:
+                message: "string"
+                error: "string"
+          description: "Returns **500** (Internal Server Error) as **application/json**"
+      security: []
+    post:
+      summary: "Update booth status (updateStatus)"
+      description: "Update the occupancy status of a booth. Requires API token authentication via x-api-token header. Stores status as history and upserts booth metadata.\n\n _app/controllers/booth_status_controller.ts_ - **updateStatus**"
+      parameters: []
+      tags:
+        - "STATUS"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  booth_id: "string"
+                  booth_name: "string"
+                  photo_key: "string|null"
+                  photo_url: "string|null"
+                  photo_miniature_url: "string|null"
+                  localization: "string|null"
+                  is_occupied: "boolean"
+                  reported_at: "timestamp"
+                  is_online: "boolean"
+              example:
+                booth_id: "string"
+                booth_name: "string"
+                photo_key: "string|null"
+                photo_url: "string|null"
+                photo_miniature_url: "string|null"
+                localization: "string|null"
+                is_occupied: "boolean"
+                reported_at: "timestamp"
+                is_online: "boolean"
+          description: "Returns **200** (OK) as **application/json**"
+        400:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message: "string"
+                  error: "string"
+              example:
+                message: "string"
+                error: "string"
+          description: "Returns **400** (Bad Request) as **application/json**"
+        401:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  error: "string"
+              example:
+                error: "string"
+          description: "Returns **401** (Unauthorized) as **application/json**"
+        403:
+          description: "Returns **403** (Forbidden)"
+        500:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message: "string"
+                  error: "string"
+              example:
+                message: "string"
+                error: "string"
+          description: "Returns **500** (Internal Server Error) as **application/json**"
+      security:
+        - ApiKeyAuth:
+            - "access"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                booth_id: "string"
+                booth_name: "string"
+                photo_key: "string?"
+                localization: "string?"
+                is_occupied: "boolean"
+            example:
+              booth_id: "string"
+              booth_name: "string"
+              photo_key: "string?"
+              localization: "string?"
+              is_occupied: "boolean"
+  /api/v1/status/{boothId}:
+    get:
+      summary: "Get single booth status (show)"
+      description: "Returns **200** (OK) as **application/json**\n\n _app/controllers/booth_status_controller.ts_ - **show**"
+      parameters:
+        - in: "path"
+          name: "boothId"
+          description: "Booth identifier"
+          schema:
+            example: ""
+            type: "string"
+          required: false
+      tags:
+        - "STATUS"
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  booth_id: "string"
+                  booth_name: "string"
+                  photo_key: "string|null"
+                  photo_url: "string|null"
+                  photo_miniature_url: "string|null"
+                  localization: "string|null"
+                  is_occupied: "boolean|null"
+                  reported_at: "timestamp|null"
+                  is_online: "boolean"
+              example:
+                booth_id: "string"
+                booth_name: "string"
+                photo_key: "string|null"
+                photo_url: "string|null"
+                photo_miniature_url: "string|null"
+                localization: "string|null"
+                is_occupied: "boolean|null"
+                reported_at: "timestamp|null"
+                is_online: "boolean"
+          description: "Returns **200** (OK) as **application/json**"
+        404:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message: "string"
+              example:
+                message: "string"
+          description: "Returns **404** (Not Found) as **application/json**"
+        500:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message: "string"
+                  error: "string"
+              example:
+                message: "string"
+                error: "string"
+          description: "Returns **500** (Internal Server Error) as **application/json**"
+      security: []
+  /api/v1/healthcheck:
+    get:
+      summary: "route"
+      description: "\n\n __ - ****"
+      parameters: []
+      tags:
+        - "HEALTHCHECK"
+      responses:
+        200:
+          description: "OK"
+          content:
+            application/json: {}
+      security: []
+tags:
+  - name: "*"
+    description: "Everything related to *"
+  - name: "BOOTHS"
+    description: "Everything related to BOOTHS"
+  - name: "FILES"
+    description: "Everything related to FILES"
+  - name: "STATUS"
+    description: "Everything related to STATUS"
+  - name: "HEALTHCHECK"
+    description: "Everything related to HEALTHCHECK"

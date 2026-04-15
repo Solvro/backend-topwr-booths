@@ -25,7 +25,8 @@ RUN --mount=type=bind,dst=/source,rw \
     cd /source &&\
     node ace build &&\
     rm /source/build/package.json /source/build/package-lock.json &&\
-    mv /source/build/* /app
+    mv /source/build/* /app &&\
+    cp /source/swagger.yml /source/swagger.json /app/
 ENV NODE_ENV=production
 EXPOSE 8080
 CMD ["node", "./bin/server.js"]
