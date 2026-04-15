@@ -72,9 +72,10 @@ export default class BoothStatusController {
   /**
    * @updateStatus
    * @summary Update booth status
-   * @description Update the occupancy status of a booth. Requires API token authentication via x-api-token header. Stores status as history and upserts booth metadata.
-   * @requestBody {"booth_id":"string","booth_name":"string","photo_key":"string?","localization":"string?","is_occupied":"boolean"}
+   * @description Update the occupancy status of a booth. Requires API token authentication via x-api-token header. Stores status as history.
+   * @requestBody {"booth_id":"string","is_occupied":"boolean"}
    * @responseBody 200 - {"booth_id":"string","booth_name":"string","photo_key":"string|null","photo_url":"string|null","photo_miniature_url":"string|null","localization":"string|null","is_occupied":"boolean","reported_at":"timestamp","is_online":"boolean"}
+   * @responseBody 404 - {"message":"string"}
    * @responseBody 400 - {"message":"string","error":"string"}
    * @responseBody 401 - {"error":"string"}
    * @responseBody 500 - {"message":"string","error":"string"}
@@ -83,35 +84,14 @@ export default class BoothStatusController {
     try {
       const data = await request.validateUsing(updateBoothStatusValidator);
       const now = DateTime.now();
-      const resolvedPhotoKey =
-        data.photo_key !== undefined
-          ? await this.resolvePhotoKey(data.photo_key)
-          : null;
 
-      let booth = await Booth.query()
+      const booth = await Booth.query()
         .where("externalId", data.booth_id)
         .first();
       if (booth === null) {
-        booth = await Booth.create({
-          externalId: data.booth_id,
-          name: data.booth_name,
-          photoKey: resolvedPhotoKey,
-          localization: data.localization ?? null,
-        });
-      } else if (
-        booth.name !== data.booth_name ||
-        (data.photo_key !== undefined && booth.photoKey !== resolvedPhotoKey) ||
-        (data.localization !== undefined &&
-          booth.localization !== data.localization)
-      ) {
-        booth.name = data.booth_name;
-        if (data.photo_key !== undefined) {
-          booth.photoKey = resolvedPhotoKey;
-        }
-        if (data.localization !== undefined) {
-          booth.localization = data.localization;
-        }
-        await booth.save();
+        return response
+          .status(404)
+          .json({ message: "Booth not found. Create booth metadata first" });
       }
 
       await booth.load("photo");

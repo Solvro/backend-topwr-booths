@@ -79,7 +79,7 @@ components:
       properties:
         id:
           type: "number"
-          example: 771
+          example: 174
         name:
           type: "string"
           example: "John Doe"
@@ -105,7 +105,7 @@ components:
       properties:
         id:
           type: "number"
-          example: 378
+          example: 593
         external_id:
           type: "string"
           example: "Lorem Ipsum"
@@ -141,10 +141,10 @@ components:
       properties:
         id:
           type: "number"
-          example: 220
+          example: 728
         booth_id:
           type: "number"
-          example: 793
+          example: 187
         is_occupied:
           type: "boolean"
           example: true
@@ -222,26 +222,12 @@ components:
           example: "Lorem Ipsum"
           required: true
           minLength: 1
-        booth_name:
-          type: "string"
-          example: "Lorem Ipsum"
-          required: true
-          minLength: 1
-        photo_key:
-          type: "string"
-          example: "Lorem Ipsum"
-        localization:
-          type: "string"
-          example: "Lorem Ipsum"
         is_occupied:
           type: "boolean"
           example: true
           required: true
       example:
         booth_id: "Lorem Ipsum"
-        booth_name: "Lorem Ipsum"
-        photo_key: "Lorem Ipsum"
-        localization: "Lorem Ipsum"
         is_occupied: true
       description: "updateBoothStatusValidator (Validator)"
 paths:
@@ -386,13 +372,13 @@ paths:
       requestBody:
         content:
           application/json: {}
-  /api/v1/status:
+  /api/v1/booths/status:
     get:
       summary: "Get latest statuses for all booths (index)"
       description: "Returns **200** (OK) as **application/json**\n\n _app/controllers/booth_status_controller.ts_ - **index**"
       parameters: []
       tags:
-        - "STATUS"
+        - "BOOTHS"
       responses:
         200:
           content:
@@ -427,10 +413,10 @@ paths:
       security: []
     post:
       summary: "Update booth status (updateStatus)"
-      description: "Update the occupancy status of a booth. Requires API token authentication via x-api-token header. Stores status as history and upserts booth metadata.\n\n _app/controllers/booth_status_controller.ts_ - **updateStatus**"
+      description: "Update the occupancy status of a booth. Requires API token authentication via x-api-token header. Stores status as history.\n\n _app/controllers/booth_status_controller.ts_ - **updateStatus**"
       parameters: []
       tags:
-        - "STATUS"
+        - "BOOTHS"
       responses:
         200:
           content:
@@ -482,6 +468,16 @@ paths:
           description: "Returns **401** (Unauthorized) as **application/json**"
         403:
           description: "Returns **403** (Forbidden)"
+        404:
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message: "string"
+              example:
+                message: "string"
+          description: "Returns **404** (Not Found) as **application/json**"
         500:
           content:
             application/json:
@@ -504,17 +500,11 @@ paths:
               type: "object"
               properties:
                 booth_id: "string"
-                booth_name: "string"
-                photo_key: "string?"
-                localization: "string?"
                 is_occupied: "boolean"
             example:
               booth_id: "string"
-              booth_name: "string"
-              photo_key: "string?"
-              localization: "string?"
               is_occupied: "boolean"
-  /api/v1/status/{boothId}:
+  /api/v1/booths/status/{boothId}:
     get:
       summary: "Get single booth status (show)"
       description: "Returns **200** (OK) as **application/json**\n\n _app/controllers/booth_status_controller.ts_ - **show**"
@@ -527,7 +517,7 @@ paths:
             type: "string"
           required: false
       tags:
-        - "STATUS"
+        - "BOOTHS"
       responses:
         200:
           content:
@@ -598,7 +588,5 @@ tags:
     description: "Everything related to BOOTHS"
   - name: "FILES"
     description: "Everything related to FILES"
-  - name: "STATUS"
-    description: "Everything related to STATUS"
   - name: "HEALTHCHECK"
     description: "Everything related to HEALTHCHECK"

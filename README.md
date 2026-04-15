@@ -54,15 +54,15 @@ Required values are in `.env.example`:
 
 ## API Endpoints
 
-| Method | Path                      | Auth  | Description                                        |
-| ------ | ------------------------- | ----- | -------------------------------------------------- |
-| POST   | `/api/v1/files`           | Token | Upload file, returns `key` (`uuid.ext`)            |
-| GET    | `/api/v1/files/:key`      | -     | Get file metadata (`url`, `miniaturesUrl`)         |
-| POST   | `/api/v1/booths`          | Token | Create booth metadata                              |
-| POST   | `/api/v1/status`          | Token | Append booth status and optionally update metadata |
-| GET    | `/api/v1/status`          | -     | Get latest status for all booths                   |
-| GET    | `/api/v1/status/:boothId` | -     | Get latest status for one booth                    |
-| GET    | `/api/v1/healthcheck`     | -     | Health endpoint                                    |
+| Method | Path                             | Auth  | Description                                |
+| ------ | -------------------------------- | ----- | ------------------------------------------ |
+| POST   | `/api/v1/files`                  | Token | Upload file, returns `key` (`uuid.ext`)    |
+| GET    | `/api/v1/files/:key`             | -     | Get file metadata (`url`, `miniaturesUrl`) |
+| POST   | `/api/v1/booths`                 | Token | Create booth metadata                      |
+| POST   | `/api/v1/booths/status`          | Token | Append booth status                        |
+| GET    | `/api/v1/booths/status`          | -     | Get latest status for all booths           |
+| GET    | `/api/v1/booths/status/:boothId` | -     | Get latest status for one booth            |
+| GET    | `/api/v1/healthcheck`            | -     | Health endpoint                            |
 
 Uploaded files are also served publicly by Drive:
 
@@ -102,12 +102,11 @@ curl -X POST http://localhost:3333/api/v1/booths \
 ### 3) Send occupancy update
 
 ```bash
-curl -X POST http://localhost:3333/api/v1/status \
+curl -X POST http://localhost:3333/api/v1/booths/status \
   -H "x-api-token: YOUR_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "booth_id": "booth-1",
-    "booth_name": "Main Booth",
     "is_occupied": true
   }'
 ```
@@ -115,8 +114,8 @@ curl -X POST http://localhost:3333/api/v1/status \
 ### 4) Read current status
 
 ```bash
-curl http://localhost:3333/api/v1/status
-curl http://localhost:3333/api/v1/status/booth-1
+curl http://localhost:3333/api/v1/booths/status
+curl http://localhost:3333/api/v1/booths/status/booth-1
 ```
 
 ## Testing

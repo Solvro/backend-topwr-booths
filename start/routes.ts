@@ -21,10 +21,10 @@ router
     router.get("/files/:key", [FilesController, "get"]);
     router.post("/files", [FilesController, "post"]).use(middleware.auth());
 
-    router.get("/status", [BoothStatusController, "index"]);
-    router.get("/status/:boothId", [BoothStatusController, "show"]);
+    router.get("/booths/status", [BoothStatusController, "index"]);
+    router.get("/booths/status/:boothId", [BoothStatusController, "show"]);
     router
-      .post("/status", [BoothStatusController, "updateStatus"])
+      .post("/booths/status", [BoothStatusController, "updateStatus"])
       .use(middleware.auth());
 
     router.get("/swagger", async () => {
