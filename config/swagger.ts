@@ -17,6 +17,7 @@ export default {
   debug: false,
   ignore: [
     "/metrics",
+    "/admin/*",
     "/api/v1/swagger",
     "/api/v1/docs",
     "/",

@@ -8,7 +8,7 @@ import ApiToken from "#models/api_token";
 
 export default class AuthMiddleware {
   public async handle(
-    { request, response }: HttpContext,
+    { request, response, session }: HttpContext,
     next: () => Promise<void>,
   ) {
     if (request.method() === "GET") {
@@ -16,9 +16,15 @@ export default class AuthMiddleware {
       return;
     }
 
-    const token = request.header("x-api-token");
+    const adminUser = session.get("adminUser") as unknown;
+    if (adminUser !== undefined && adminUser !== null) {
+      await next();
+      return;
+    }
 
-    if (token === undefined) {
+    const token = this.extractToken(request);
+
+    if (token === null) {
       logger.error("missing token");
       return response.unauthorized({ error: "Missing API token" });
     }
@@ -35,5 +41,26 @@ export default class AuthMiddleware {
     await authToken.save();
 
     await next();
+  }
+
+  private extractToken(request: HttpContext["request"]): string | null {
+    const apiTokenHeader = request.header("x-api-token");
+    if (apiTokenHeader !== undefined) {
+      const normalized = apiTokenHeader.trim();
+      if (normalized.length > 0) {
+        return normalized.replace(/^Bearer\s+/i, "").trim();
+      }
+    }
+
+    const authorizationHeader = request.header("authorization");
+    if (authorizationHeader !== undefined) {
+      const match = /^Bearer\s+(.+)$/i.exec(authorizationHeader);
+      const normalized = match?.[1]?.trim();
+      if (normalized !== undefined && normalized.length > 0) {
+        return normalized;
+      }
+    }
+
+    return null;
   }
 }

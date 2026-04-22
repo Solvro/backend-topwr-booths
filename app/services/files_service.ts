@@ -65,6 +65,19 @@ export default class FilesService {
     return lastIndex > 0 ? keyToTrim.substring(0, lastIndex) : keyToTrim;
   }
 
+  static async deleteFileByEntry(entry: FileEntry): Promise<boolean> {
+    return await db.transaction(async (trx) => {
+      await entry.useTransaction(trx).delete();
+
+      const key = entry.keyWithExtension;
+      if (entry.isPhoto()) {
+        await getMiniaturesDrive().delete(key);
+      }
+      await getMainDrive().delete(key);
+      return true;
+    });
+  }
+
   private static async uploadFromMemoryInternal(
     data: Uint8Array,
     fileEntry: FileEntry,

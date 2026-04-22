@@ -8,9 +8,15 @@ import { middleware } from "#start/kernel";
 const BoothStatusController = () =>
   import("#controllers/booth_status_controller");
 const FilesController = () => import("#controllers/files_controller");
+const AdminFilesController = () =>
+  import("#controllers/admin_files_controller");
 const MetricsMiddleware = () => import("@solvro/solvronis-metrics");
 
 router.get("/metrics", [MetricsMiddleware, "emitMetrics"]);
+
+router
+  .post("/admin/upload-image", [AdminFilesController, "post"])
+  .use(middleware.adminSession());
 
 router
   .group(() => {

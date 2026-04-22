@@ -79,7 +79,7 @@ components:
       properties:
         id:
           type: "number"
-          example: 174
+          example: 584
         name:
           type: "string"
           example: "John Doe"
@@ -105,7 +105,7 @@ components:
       properties:
         id:
           type: "number"
-          example: 593
+          example: 161
         external_id:
           type: "string"
           example: "Lorem Ipsum"
@@ -141,10 +141,10 @@ components:
       properties:
         id:
           type: "number"
-          example: 728
+          example: 566
         booth_id:
           type: "number"
-          example: 187
+          example: 626
         is_occupied:
           type: "boolean"
           example: true
@@ -189,6 +189,29 @@ components:
           type: "string"
           example: "Lorem Ipsum"
       description: "FileEntry (Model)"
+    User:
+      type: "object"
+      required: []
+      properties:
+        id:
+          type: "number"
+          example: 979
+        full_name:
+          type: "string"
+          example: "John Doe"
+        email:
+          type: "string"
+          example: "johndoe@example.com"
+          format: "email"
+        created_at:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+        updated_at:
+          type: "string"
+          example: "2021-03-23T16:13:08.489+01:00"
+          format: "date-time"
+      description: "User (Model)"
     createBoothValidator:
       type: "object"
       properties:

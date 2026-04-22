@@ -11,7 +11,9 @@ server.use([
 ]);
 
 router.use([() => import("@adonisjs/core/bodyparser_middleware")]);
+router.use([() => import("@adonisjs/session/session_middleware")]);
 
 export const middleware = router.named({
   auth: () => import("#middleware/auth_middleware"),
+  adminSession: () => import("#middleware/admin_session_middleware"),
 });
