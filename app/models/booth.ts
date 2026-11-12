@@ -22,6 +22,9 @@ export default class Booth extends BaseModel {
   @column()
   declare localization: string | null;
 
+  @column()
+  declare tracksOccupancy: boolean;
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime;
 

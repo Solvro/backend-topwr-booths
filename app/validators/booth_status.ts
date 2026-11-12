@@ -13,5 +13,6 @@ export const createBoothValidator = vine.compile(
     booth_name: vine.string().trim().minLength(1),
     photo_key: vine.string().trim().optional(),
     localization: vine.string().trim().optional(),
+    tracks_occupancy: vine.boolean().optional(),
   }),
 );

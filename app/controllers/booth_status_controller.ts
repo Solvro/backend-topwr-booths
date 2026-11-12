@@ -18,8 +18,8 @@ export default class BoothStatusController {
    * @createBooth
    * @summary Create new booth
    * @description Create a new booth (metadata only). Requires API token authentication via x-api-token header.
-   * @requestBody {"booth_id":"string","booth_name":"string","photo_key":"string?","localization":"string?"}
-   * @responseBody 201 - {"booth_id":"string","booth_name":"string","photo_key":"string|null","photo_url":"string|null","photo_miniature_url":"string|null","localization":"string|null"}
+   * @requestBody {"booth_id":"string","booth_name":"string","photo_key":"string?","localization":"string?","tracks_occupancy":"boolean?"}
+   * @responseBody 201 - {"booth_id":"string","booth_name":"string","photo_key":"string|null","photo_url":"string|null","photo_miniature_url":"string|null","localization":"string|null","tracks_occupancy":"boolean"}
    * @responseBody 409 - {"message":"string"}
    * @responseBody 401 - {"error":"string"}
    * @responseBody 500 - {"message":"string","error":"string"}
@@ -47,6 +47,7 @@ export default class BoothStatusController {
         name: data.booth_name,
         photoKey,
         localization: data.localization ?? null,
+        tracksOccupancy: data.tracks_occupancy ?? true,
       });
 
       await booth.load("photo");
@@ -59,6 +60,7 @@ export default class BoothStatusController {
         photo_url: photo.url,
         photo_miniature_url: photo.miniatureUrl,
         localization: booth.localization,
+        tracks_occupancy: booth.tracksOccupancy,
       });
     } catch (error) {
       assert(error instanceof Error);
@@ -74,7 +76,7 @@ export default class BoothStatusController {
    * @summary Update booth status
    * @description Update the occupancy status of a booth. Requires API token authentication via x-api-token header. Stores status as history.
    * @requestBody {"booth_id":"string","is_occupied":"boolean"}
-   * @responseBody 200 - {"booth_id":"string","booth_name":"string","photo_key":"string|null","photo_url":"string|null","photo_miniature_url":"string|null","localization":"string|null","is_occupied":"boolean","reported_at":"timestamp","is_online":"boolean"}
+   * @responseBody 200 - {"booth_id":"string","booth_name":"string","photo_key":"string|null","photo_url":"string|null","photo_miniature_url":"string|null","localization":"string|null","tracks_occupancy":"boolean","is_occupied":"boolean","reported_at":"timestamp","is_online":"boolean"}
    * @responseBody 404 - {"message":"string"}
    * @responseBody 400 - {"message":"string","error":"string"}
    * @responseBody 401 - {"error":"string"}
@@ -113,6 +115,7 @@ export default class BoothStatusController {
         photo_url: photo.url,
         photo_miniature_url: photo.miniatureUrl,
         localization: booth.localization,
+        tracks_occupancy: booth.tracksOccupancy,
         is_occupied: boothStatus.isOccupied,
         reported_at: boothStatus.reportedAt.toISO(),
         is_online: isOnline,
@@ -131,7 +134,7 @@ export default class BoothStatusController {
    * @index
    * @summary Get latest statuses for all booths
    * @description Retrieve latest status information for all booths. is_online field indicates if booth sent update within last 3 minutes.
-   * @responseBody 200 - [{"booth_id":"string","booth_name":"string","photo_key":"string|null","photo_url":"string|null","photo_miniature_url":"string|null","localization":"string|null","is_occupied":"boolean","reported_at":"timestamp","is_online":"boolean"}]
+   * @responseBody 200 - [{"booth_id":"string","booth_name":"string","photo_key":"string|null","photo_url":"string|null","photo_miniature_url":"string|null","localization":"string|null","tracks_occupancy":"boolean","is_occupied":"boolean","reported_at":"timestamp","is_online":"boolean"}]
    * @responseBody 500 - {"message":"string","error":"string"}
    */
   async index({ response }: HttpContext) {
@@ -154,6 +157,7 @@ export default class BoothStatusController {
               photo_url: photo.url,
               photo_miniature_url: photo.miniatureUrl,
               localization: booth.localization,
+              tracks_occupancy: booth.tracksOccupancy,
               is_occupied: null,
               reported_at: null,
               is_online: false,
@@ -170,6 +174,7 @@ export default class BoothStatusController {
             photo_url: photo.url,
             photo_miniature_url: photo.miniatureUrl,
             localization: booth.localization,
+            tracks_occupancy: booth.tracksOccupancy,
             is_occupied: latestStatus.isOccupied,
             reported_at: latestStatus.reportedAt.toISO(),
             is_online: isOnline,
@@ -193,7 +198,7 @@ export default class BoothStatusController {
    * @summary Get single booth status
    * @description Retrieve latest status information for a specific booth by external ID.
    * @paramPath boothId - Booth identifier - @type(string)
-   * @responseBody 200 - {"booth_id":"string","booth_name":"string","photo_key":"string|null","photo_url":"string|null","photo_miniature_url":"string|null","localization":"string|null","is_occupied":"boolean|null","reported_at":"timestamp|null","is_online":"boolean"}
+   * @responseBody 200 - {"booth_id":"string","booth_name":"string","photo_key":"string|null","photo_url":"string|null","photo_miniature_url":"string|null","localization":"string|null","tracks_occupancy":"boolean","is_occupied":"boolean|null","reported_at":"timestamp|null","is_online":"boolean"}
    * @responseBody 404 - {"message":"string"}
    * @responseBody 500 - {"message":"string","error":"string"}
    */
@@ -224,6 +229,7 @@ export default class BoothStatusController {
           photo_url: photo.url,
           photo_miniature_url: photo.miniatureUrl,
           localization: booth.localization,
+          tracks_occupancy: booth.tracksOccupancy,
           is_occupied: null,
           reported_at: null,
           is_online: false,
@@ -240,6 +246,7 @@ export default class BoothStatusController {
         photo_url: photo.url,
         photo_miniature_url: photo.miniatureUrl,
         localization: booth.localization,
+        tracks_occupancy: booth.tracksOccupancy,
         is_occupied: latestStatus.isOccupied,
         reported_at: latestStatus.reportedAt.toISO(),
         is_online: isOnline,
